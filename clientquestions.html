@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Questions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        #quiz-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h2>Quiz Questions</h2>
+        <div id="questions"></div>
+        <button id="submit-quiz">Submit Answers</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            return document.cookie.split('; ').reduce((res, item) => {
+                const [key, value] = item.split('=');
+                return key === name ? decodeURIComponent(value) : res;
+            }, '');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = getCookie('name');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            usernameDisplay.innerText = username ? `Stored Username: ${username}` : "No username found in cookie.";
+        });
+        const questions = [
+            { question: "What is the capital of France?", answer: "Paris" },
+            { question: "What is 2 + 2?", answer: "4" },
+            { question: "What color is the sky?", answer: "blue" },
+            { question: "What is the largest ocean on Earth?", answer: "Pacific" },
+            { question: "What is the freezing point of water?", answer: "0" }
+        ];
+
+        let correctAnswersCount = 0;
+        const username = sessionStorage.getItem('username');
+
+        questions.forEach((q, index) => {
+            const questionElement = document.createElement('div');
+            questionElement.innerHTML = `
+                <p>${index + 1}. ${q.question}</p>
+                <input type="text" id="answer${index}" placeholder="Your answer">
+            `;
+            document.getElementById('questions').appendChild(questionElement);
+        });
+
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            correctAnswersCount = 0;
+
+            questions.forEach((q, index) => {
+                const userAnswer = document.getElementById(`answer${index}`).value.trim();
+                if (userAnswer.toLowerCase() === q.answer.toLowerCase()) {
+                    correctAnswersCount++;
+                }
+            });
+
+            // Send correct answer count to the server
+            fetch('https://script.google.com/macros/s/AKfycbyKZY6u1Y0oKyThnpZwN48jUZ5eXvp6aK3UpPhXIlfZ5yuOr4PwZMZ2c9rdh6IK2Lgl/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'name': username,
+                    'email': correctAnswersCount
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "Success") {
+                    document.getElementById('message').innerText = "Quiz submitted successfully!";
+                    // Redirect to view page after a short delay
+                    setTimeout(() => {
+                        window.location.href = './clientquestions.html';
+                    }, 2000);
+                } else {
+                    document.getElementById('message').innerText = "Error submitting quiz.";
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById('message').innerText = "Error submitting quiz.";
+            });
+        });
+    </script>
+</body>
+</html>
