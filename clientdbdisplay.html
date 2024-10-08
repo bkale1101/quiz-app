@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Submitted Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column; /* Vertical alignment */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        h2 {
+            color: #333;
+            margin: 0 0 20px; /* Space between title and other content */
+        }
+        #qr-code {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px; /* Space below the QR code */
+        }
+        img {
+            max-width: 300px;
+            height: auto;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+        }
+        #data-table {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 500px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Scan the QR Code</h2>
+    <div id="qr-code">
+        <img id="qr-image" src="" alt="QR Code">
+    </div>
+
+    <div id="data-table">
+        <h2>Submitted Data</h2>
+        <table id="sheet-data">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Money</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data from Google Sheets will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Predefined link to generate QR code for
+        const predefinedLink = "https://bkale1101.github.io/quizapp/"; // Change this link as needed
+
+        // Generate QR Code using QRCode API
+        const qrImage = document.getElementById('qr-image');
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(predefinedLink)}&size=300x300`;
+
+        // Function to fetch data from Google Sheets and display it in the table
+        function fetchSheetData() {
+            // Replace 'YOUR_DATA_WEB_APP_URL' with the actual URL of your Google Apps Script for fetching data
+            fetch('https://script.google.com/macros/s/AKfycbyKZY6u1Y0oKyThnpZwN48jUZ5eXvp6aK3UpPhXIlfZ5yuOr4PwZMZ2c9rdh6IK2Lgl/exec')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#sheet-data tbody');
+                    tableBody.innerHTML = ''; // Clear existing data
+
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.name}</td>
+                            <td>${row.email}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                });
+        }
+
+        // Fetch the data when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchSheetData();
+            setInterval(fetchSheetData, 2000);  // Reload every 2 seconds
+        });
+    </script>
+</body>
+</html>
