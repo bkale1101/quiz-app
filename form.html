@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Data Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        #form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div id="form-container">
+        <h2>Submit Data Form</h2>
+        <form id="contact-form">
+            <input type="text" id="name" placeholder="Your Name" required>
+            <input type="email" id="email" placeholder="Your Email" required>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            // Replace 'YOUR_FORM_WEB_APP_URL' with the URL of your Google Apps Script for form submission
+            fetch('https://script.google.com/macros/s/AKfycbz7ixZQPoQMJr6jNorwPvk_WE2AyQTJeD2VRGrupC1Rw1LsUb6MF5tJdU7zpY9gGZ3F/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'name': name,
+                    'email': email
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "Success") {
+                    document.getElementById('message').innerText = "Form submitted successfully!";
+                    document.getElementById('contact-form').reset(); // Reset the form
+                } else {
+                    document.getElementById('message').innerText = "Error submitting form.";
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                document.getElementById('message').innerText = "Error submitting form.";
+            });
+        });
+    </script>
+</body>
+</html>
