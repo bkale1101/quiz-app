@@ -59,11 +59,17 @@
             margin-top: 10px;
             font-size: 1.2em;
         }
+        #money-display {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div id="quiz-container">
+    <div id="money-display">Money Earned: Rs. 0</div>
     <h2 id="question-title"></h2>
     <div id="options-container"></div>
     <button id="next-button">Next Question</button>
@@ -100,9 +106,10 @@
     ];
 
     let currentQuestionIndex = 0;
-    let score = 0;
+    let money = 0;
     let selectedOption = null;
 
+    const moneyDisplay = document.getElementById("money-display");
     const questionTitle = document.getElementById("question-title");
     const optionsContainer = document.getElementById("options-container");
     const nextButton = document.getElementById("next-button");
@@ -144,7 +151,8 @@
         }
 
         if (selectedOption === questions[currentQuestionIndex].answer) {
-            score++;
+            money += 1000; // Increment money by 1000 for each correct answer
+            moneyDisplay.textContent = `Money Earned: $${money}`; // Update money display
             message.textContent = "Correct!";
             message.style.color = "green";
         } else {
@@ -161,8 +169,8 @@
             selectedOption = null;
             displayQuestion();
         } else {
-            // Show final score
-            questionTitle.textContent = `Quiz Complete! Your score: ${score}/${questions.length}`;
+            // Show final money earned
+            questionTitle.textContent = `Quiz Complete! Total money earned: $${money}`;
             optionsContainer.style.display = 'none'; // Hide options
             nextButton.style.display = 'none'; // Hide next button
             message.style.display = 'none'; // Hide message
